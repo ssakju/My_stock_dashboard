@@ -1,16 +1,16 @@
-name: Update Top 100 Stocks
+name: Update Top 100 Data
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # 매 5분마다 실행
-  workflow_dispatch:  # 수동 실행도 가능
+    - cron: '*/5 * * * *'  # 매 15분마다 실행
+  workflow_dispatch:         # 수동 실행도 가능
 
 jobs:
   update:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout repo
       uses: actions/checkout@v3
 
     - name: Set up Python
@@ -19,17 +19,24 @@ jobs:
         python-version: '3.10'
 
     - name: Install dependencies
-      run: pip install yfinance pandas lxml
+      run: |
+        python -m pip install --upgrade pip
+        pip install yfinance pandas beautifulsoup4 lxml requests
 
-    - name: Run script
+    - name: Run update_data.py
       run: python scripts/update_data.py
 
-    - name: Commit and push
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Commit and push if changed
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add data/top100.json
-        git commit -m "Update top100.json" || echo "No changes"
-        git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "🔄 Update top100.json [auto]"
+          git push
+        fi
+      env:
+        # GitHub Actions 기본 제공 토큰
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
