@@ -1,101 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>미국장 상승률 TOP 100</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📈 Top 100 Gainers - 실시간 주가 대시보드</title>
   <style>
-    body { font-family: sans-serif; padding: 1rem; background: #f5f5f5; }
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
-    th { background: #eee; }
-    .chart { height: 50px; }
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+    }
+    h1 {
+      text-align: center;
+      padding: 1rem;
+    }
+    .stock-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .stock-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      margin: 1rem;
+      padding: 1rem;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .symbol {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    canvas {
+      width: 100% !important;
+      height: 200px !important;
+    }
   </style>
 </head>
 <body>
-  <h1>📈 미국장 상승률 TOP 100</h1>
-  <p>실시간 데이터가 아래에 표시됩니다.</p>
+  <h1>📊 실시간 상승률 상위 100종목</h1>
+  <div class="stock-container" id="stock-container"></div>
 
-  <div id="stock-table">
-    <script>
-    async function loadData() {
-      const res = await fetch("data/top100.json");
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    async function fetchData() {
+      const res = await fetch('data/top100.json?_t=' + new Date().getTime()); // 캐싱 방지
       const data = await res.json();
-      const tbody = document.querySelector("tbody");
-      tbody.innerHTML = "";
-      data.forEach((item, i) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${i + 1}</td>
-          <td>${item.symbol}</td>
-          <td>${item.change.toFixed(2)}%</td>
-          <td>${item.volume.toLocaleString()}</td>
-          <td>
-            <canvas class="chart" width="100" height="30" id="chart${i}"></canvas>
-          </td>
-        `;
-        tbody.appendChild(row);
+      return data;
+    }
 
-        const ctx = document.getElementById("chart" + i).getContext("2d");
-        new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: item.timestamps,
-            datasets: [{
-              data: item.data,
-              borderColor: "green",
-              borderWidth: 1,
-              fill: false,
-              tension: 0.2
-            }]
+    function createChart(ctx, labels, data) {
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Price ($)',
+            data: data,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          scales: {
+            x: { display: false },
+            y: { ticks: { callback: val => '$' + val.toFixed(2) } }
           },
-          options: {
-            responsive: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { display: false },
-              y: { display: false }
-            }
+          plugins: {
+            legend: { display: false }
           }
-        });
+        }
       });
     }
-  async function loadData() {
-    try {
-      const res = await fetch('data/top100.json?ts=' + Date.now()); // 캐시 방지
-      const json = await res.json();
-      updateDashboard(json); // 이 함수는 기존에 있던 대시보드 렌더링 함수일 거예요
-    } catch (e) {
-      console.error("❌ 데이터 불러오기 실패", e);
+
+    function renderStocks(stocks) {
+      const container = document.getElementById('stock-container');
+      container.innerHTML = ''; // Clear old content
+
+      stocks.forEach(stock => {
+        const card = document.createElement('div');
+        card.className = 'stock-card';
+
+        const info = document.createElement('div');
+        info.className = 'info';
+        info.innerHTML = `
+          <div class="symbol">${stock.symbol}</div>
+          <div>📈 ${stock.change}% | 💰 ${stock.volume.toLocaleString()}</div>
+        `;
+
+        const canvas = document.createElement('canvas');
+        canvas.id = 'chart-' + stock.symbol;
+
+        card.appendChild(info);
+        card.appendChild(canvas);
+        container.appendChild(card);
+
+        createChart(canvas.getContext('2d'), stock.timestamps, stock.data);
+      });
     }
-  }
 
+    async function refresh() {
+      const data = await fetchData();
+      renderStocks(data);
+    }
 
-  function renderTable(data) {
-    const container = document.getElementById("stock-table");
-    container.innerHTML = "";  // 기존 내용 초기화
-
-    data.forEach(stock => {
-      const row = document.createElement("div");
-      row.innerHTML = `
-        <strong>${stock.symbol}</strong> | 
-        📈 ${stock.change}% | 
-        💰 ${stock.volume.toLocaleString()} | 
-        🕒 ${stock.timestamps.at(-1)}
-      `;
-      container.appendChild(row);
-    });
-  }
-  // 최초 1회 로딩
-  loadData();
-
-  // 이후 매 1분마다 자동 갱신
-  setInterval(loadData, 60000); // 60000ms = 60초
-    
+    refresh();
+    setInterval(refresh, 60 * 1000); // 1분마다 갱신
   </script>
-  </div>
-
-  
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
