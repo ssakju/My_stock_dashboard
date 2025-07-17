@@ -72,8 +72,22 @@
         });
       });
     }
+  async function loadData() {
+    try {
+      const res = await fetch('data/top100.json?ts=' + Date.now()); // 캐시 방지
+      const json = await res.json();
+      updateDashboard(json); // 이 함수는 기존에 있던 대시보드 렌더링 함수일 거예요
+    } catch (e) {
+      console.error("❌ 데이터 불러오기 실패", e);
+    }
+  }
 
-    window.onload = loadData;
+  // 최초 1회 로딩
+  loadData();
+
+  // 이후 매 1분마다 자동 갱신
+  setInterval(loadData, 60000); // 60000ms = 60초
+    
   </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
