@@ -16,20 +16,8 @@
   <h1>📈 미국장 상승률 TOP 100</h1>
   <p>실시간 데이터가 아래에 표시됩니다.</p>
 
-  <table id="stock-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>종목</th>
-        <th>변동률</th>
-        <th>거래량</th>
-        <th>그래프</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <script>
+  <div id="stock-table">
+    <script>
     async function loadData() {
       const res = await fetch("data/top100.json");
       const data = await res.json();
@@ -105,6 +93,9 @@
   setInterval(loadData, 60000); // 60000ms = 60초
     
   </script>
+  </div>
+
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
