@@ -47,8 +47,8 @@ def fetch_ticker_data(symbol):
             'symbol': symbol,
             'change': round(percent_change, 2),
             'volume': int(total_volume),
-            'data': hist['Close'].tail(20).tolist(),  # 최근 20개 (약 100분)
-            'timestamps': [t.strftime('%H:%M') for t in hist.index[-20:]]
+            'data': hist['Close'].tolist(),
+            'timestamps': [t.strftime('%H:%M') for t in hist.index]
         }
 
     except Exception as e:
