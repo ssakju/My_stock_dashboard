@@ -20,18 +20,18 @@ def get_all_us_stocks():
 
     for name, url in urls.items():
         r = requests.get(url)
-        text = r.text
-        text = text.strip().split('\n')
-        # 마지막 줄 제거 (파일정보)
-        text = "\n".join(text[:-1])
+        text = r.text.strip().split('\n')
+        text = "\n".join(text[:-1])  # 마지막 줄 제거
         df = pd.read_csv(StringIO(text), sep='|')
         if 'Symbol' in df.columns:
             dfs.append(df[['Symbol']])
         elif 'ACT Symbol' in df.columns:
             dfs.append(df[['ACT Symbol']].rename(columns={'ACT Symbol': 'Symbol'}))
 
-    all_symbols = pd.concat(dfs)['Symbol'].drop_duplicates().tolist()
-    return [s for s in all_symbols if '^' not in s and '/' not in s]
+    all_symbols = pd.concat(dfs)['Symbol'].dropna().astype(str).drop_duplicates()
+    clean_symbols = [s for s in all_symbols if '^' not in s and '/' not in s]
+
+    return clean_symbols
 
 # 전체 미국 티커 목록
 ticker_list = get_all_us_stocks()
