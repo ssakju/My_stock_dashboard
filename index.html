@@ -82,6 +82,22 @@
     }
   }
 
+
+  function renderTable(data) {
+    const container = document.getElementById("stock-table");
+    container.innerHTML = "";  // 기존 내용 초기화
+
+    data.forEach(stock => {
+      const row = document.createElement("div");
+      row.innerHTML = `
+        <strong>${stock.symbol}</strong> | 
+        📈 ${stock.change}% | 
+        💰 ${stock.volume.toLocaleString()} | 
+        🕒 ${stock.timestamps.at(-1)}
+      `;
+      container.appendChild(row);
+    });
+  }
   // 최초 1회 로딩
   loadData();
 
