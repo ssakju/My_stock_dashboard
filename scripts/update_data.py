@@ -4,8 +4,8 @@ from datetime import datetime
 from korea_investment_api import KoreaInvestmentAPI
 
 # ⛳ 환경변수 또는 직접 입력
-APP_KEY = os.getenv("KIS_APP_KEY") or "발급받은_APP_KEY"
-APP_SECRET = os.getenv("KIS_APP_SECRET") or "발급받은_APP_SECRET"
+APP_KEY = os.getenv("KIS_APP_KEY") or "PSbF6pKypYw2g5ua17ncklCuBCOkIMRZOjEt"
+APP_SECRET = os.getenv("KIS_APP_SECRET") or "n+hYBO/M48toc7cKLqUgMZIlAftvv/HuSggc8hlDhBKlbqHMORoCvpBd9YJc2jaNxMNkuqFrGDHRd3sRvBvXwVrusyjajq0rxOYqaA8Icwkdq/5U78yVk+DULSnPK6eKX40fAPIllXYS2qGYslb0f1y9o3MuIoge9wa0Rr93uR2YzSy7uNU="
 ACCOUNT_NO = os.getenv("KIS_ACCOUNT_NO") or "12345678-01"
 
 # ✅ API 초기화 (모의투자: virtual=True)
