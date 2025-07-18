@@ -1,7 +1,7 @@
 import os
 import json
 from datetime import datetime
-from korea_investment_api import KoreaInvestmentAPI
+from korea_investment_stock import KoreaInvestmentAPI
 
 # ⛳ 환경변수 또는 직접 입력
 APP_KEY = os.getenv("KIS_APP_KEY") or "PSbF6pKypYw2g5ua17ncklCuBCOkIMRZOjEt"
