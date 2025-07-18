@@ -2,4 +2,4 @@ pandas
 yfinance
 requests
 beautifulsoup4
-korea-investment-api
+korea-investment-stock
