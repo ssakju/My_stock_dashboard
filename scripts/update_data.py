@@ -1,5 +1,6 @@
 import os
 import json
+import plotly.graph_objects as go
 from datetime import datetime
 from korea_investment_stock import KoreaInvestmentAPI
 
